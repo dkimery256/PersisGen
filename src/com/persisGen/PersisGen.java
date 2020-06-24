@@ -1,3 +1,5 @@
+// TODO remove unneeded overrides, fix Service Imp indent, fix postgres Serial data type, add get all to services
+
 package com.persisGen;
 
 import java.io.File;
@@ -344,7 +346,9 @@ public class PersisGen {
 				String servicePath = root + "\\" + textServices.getText().trim().replace(".", "\\");
 				
 				// file names
-				String type = inflector.capitalize(inflector.singularize(textTypeName.getText().trim()));
+				// Auto Format or Not?
+				// String type = inflector.capitalize(inflector.singularize(textTypeName.getText().trim()));
+				String type = textTypeName.getText().trim();
 				if (type.equals("")) {
 					MessageDialog.openError(shlPersisgen, "Error", "Your Type is missing the name.");
 					return;

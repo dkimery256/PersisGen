@@ -21,6 +21,7 @@ public class TypeParser extends CodeGen {
 	
 	// Hibernate Entity
 	private final String[] hibernateImports = {
+		"import java.io.Serializable;",
 		"import java.util.Date;",
 		"",
 		"import javax.persistence.Column;",
@@ -38,7 +39,7 @@ public class TypeParser extends CodeGen {
 		"@Data",
 		"@Entity",
 		"@Table(name=\"{table}\")",
-		"public class {type} {",
+		"public class {type} implements Serializable {",
 		"",
 		"{properties}",
 		"}"
@@ -164,14 +165,17 @@ public class TypeParser extends CodeGen {
 		// id or uid see if we are int or character
 		// also check for auto increment
 		if (fieldName.equals("uid") || fieldName.equals("id")) {
+			ServiceParser.idName = inflector.capitalize(fieldName);
 			if (fieldType.contains("int")) {
 				if (fieldType.toUpperCase().contains("AUTO_INCREMENT") && this.isMakeRepo()) {
 					property = ID_AUTO + fieldName + ";";
 				} else {
 					property = "\tprivate long " + fieldName + ";";
+					ServiceParser.idType = "long";
 				}
 			} else {
 				property = "\tprivate String " + fieldName + ";";
+				ServiceParser.idType = "Sring";
 			}
 		} else {  // non id columns
 			
@@ -244,14 +248,13 @@ public class TypeParser extends CodeGen {
 				// id or uid see if we are int or character
 				// also check for auto increment
 				if (fieldName.equals("uid") || fieldName.equals("id")) {
-					if (fieldType.contains("int")) {
-						if (fieldType.toUpperCase().contains("SERIAL") && this.isMakeRepo()) {
-							property = ID_AUTO + fieldName + ";";
-						} else {
-							property = "\tprivate long " + fieldName + ";";
-						}
+					ServiceParser.idName = inflector.capitalize(fieldName);
+					if (fieldType.toUpperCase().contains("SERIAL") && this.isMakeRepo()) {
+						property = ID_AUTO + fieldName + ";";
+						ServiceParser.idType = "long";
 					} else {
-						property = "\tprivate String " + fieldName + ";";
+						property = "\t@Id\n\tprivate String " + fieldName + ";";
+						ServiceParser.idType = "Sring";
 					}
 				} else {  // non id columns
 					

@@ -5,6 +5,9 @@ import java.util.List;
 
 public class ServiceParser extends CodeGen {
 	
+	public static String idType = "";
+	public static String idName = "";
+	
 	// Place holders and Fillers	
 	private String generatedService = "";
 	private String generatedServiceImpl = "";
@@ -22,6 +25,7 @@ public class ServiceParser extends CodeGen {
 	private final String HIBERNATE_INTERFACE_METHODS = "{hibernateInterfaceMethods}";
 	private final String PROPERTY = "{property}";
 	private final String UPDATE_PROPS = "{updateProperties}";
+	private final String ID_NAME = "{idName}";
 	
 	// TODO Add mybatis code for mappers only
 	// private final String MYBATIS_METHODS = "{myBatisMethods}";
@@ -30,10 +34,12 @@ public class ServiceParser extends CodeGen {
 	private final String AUTOWIRED_MYBATIS = "\t@Autowired\n\tprivate {type}Mapper mapper;";
 	private final String ALL = "{all}";
 	private final String ID = "{id}";
+	private final String SAVE_ID = "{saveId}";
 	private final String GET_ALL = "mapper.getAll();";
-	private final String FIND_ALL = "repository.findAll();";
-	private final String GET_BY = "mapper.getById(id);";
-	private final String FIND_BY = "repository.findById(id);";
+	private final String GET_BY = "mapper.getBy{idName}(id);";
+	private final String GET_BY_SAVE = "mapper.getBy{idName}(entity.get{idName}());";
+	// private final String FIND_ALL = "repository.findAll();";
+	// private final String FIND_BY = "repository.findBy{idName}(id);";
 	private final String UPDATE = "\t\t\t\tupdate{type}.set{property}(entity.get{property}());";
 	
 	private final String[] importsHibernate = {
@@ -109,12 +115,11 @@ public class ServiceParser extends CodeGen {
 		sb.append(nl);
 		sb.append("{imports}" + nl);
 		sb.append(nl);
-		sb.append("\t@Service" + nl);
-		sb.append("\tpublic class {type}ServiceImpl implements {type}Service {"+ nl);
+		sb.append("@Service" + nl);
+		sb.append("public class {type}ServiceImpl implements {type}Service {"+ nl);
 		sb.append(nl);
 		sb.append("{autowires}" + nl);
 		sb.append(nl);
-		sb.append("\t@Override" + nl);
 		sb.append("\tpublic List<{type}> getAll() {" + nl);
 		sb.append("\t\tList<{type}> {typePlural} = {all}" + nl);
 		sb.append(nl);
@@ -124,8 +129,7 @@ public class ServiceParser extends CodeGen {
 		sb.append("\t\t\treturn null;" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
-		sb.append("\t@Override" + nl);
-		sb.append("\tpublic {type} getById(long id) {" + nl);
+		sb.append("\tpublic {type} getBy" + idName + "(" + idType + " " + idName + ") {" + nl);
 		sb.append("\t\tOptional<{type}> {typeSingular} = {id}" + nl);
 		sb.append(nl);
 		sb.append("\t\tif({typeSingular}.isPresent())" + nl);
@@ -152,32 +156,28 @@ public class ServiceParser extends CodeGen {
 	
 	private String hibernateMethods() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(nl + "\t@Override" + nl);
-		sb.append("\tpublic {type} save({type} {typeSingular}) {" + nl);
+		sb.append(nl + "\tpublic {type} save({type} {typeSingular}) {" + nl);
 		sb.append("\t\treturn createOrUpdate{type}({typeSingular});" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
-		sb.append("\t@Override" + nl);
 		sb.append("\tpublic boolean delete({type} {typeSingular}) {" + nl);
 		sb.append("\t\t// set the deleted field" + nl);
 		sb.append("\t\t{typeSingular}.setDeletedAt(new Date());" + nl);
 		sb.append("\t\treturn createOrUpdate{type}({typeSingular}) != null ? true : false;" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
-		sb.append("\t@Override" + nl);
-		sb.append("\tpublic boolean purge(long id) {" + nl);
-		sb.append("\t\tOptional<{type}> {typeSingular} = repository.findById(id);" + nl);
-		sb.append(nl);
-		sb.append("\t\tif({typeSingular}.isPresent()) {" + nl);
-		sb.append("\t\t\trepository.deleteById(id);" + nl);
+		sb.append("\tpublic boolean purge({type} {typeSingular}) {" + nl);
+		sb.append("\t\ttry {" + nl);
+		sb.append("\t\t\trepository.delete({typeSingular});" + nl);
 		sb.append("\t\t\treturn true;" + nl);
+		sb.append("\t\t} catch(Exception e) {" + nl);
+		sb.append("\t\t\treturn false;" + nl);
 		sb.append("\t\t}" + nl);
-		sb.append("\t\treturn false;" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
 		sb.append("\t// Create or update record" + nl);
 		sb.append("\tprivate {type} createOrUpdate{type}({type} entity) {" + nl);
-		sb.append("\t\tOptional<{type}> {typeSingular} = repository.findById(entity.getId());" + nl);
+		sb.append("\t\tOptional<{type}> {typeSingular} = {saveId}" + nl);
 		sb.append(nl);		
 		sb.append("\t\ttry {" + nl);
 		sb.append("\t\t\tif({typeSingular}.isPresent()) {" + nl);
@@ -212,17 +212,17 @@ public class ServiceParser extends CodeGen {
 			String methods = "";
 			String interfaceMethods = "";
 			String autowires = "";			
-			String all = "";			
-			String id = "";
-			
+				
+			// for now just use mybatis for selects
+			String all = GET_ALL;
+			String id = GET_BY;
+			String saveId = GET_BY_SAVE;
 			
 			// set imports, autowires and repo/mapper method calls
 			// both mapper and repo
 			if (this.isMakeRepo() && this.isMakeMapper()) {
 				String[] importsArray = importBoth;
-				autowires = AUTOWIRED_HIBERNATE + nl + nl + AUTOWIRED_MYBATIS;
-				all = GET_ALL;
-				id = GET_BY;
+				autowires = AUTOWIRED_HIBERNATE + nl + nl + AUTOWIRED_MYBATIS;				
 				interfaceMethods = hibernateInterfaceMethods();
 				methods = hibernateMethods();
 				imports = String.join(nl, importsArray);
@@ -233,9 +233,7 @@ public class ServiceParser extends CodeGen {
 			// only mapper
 			if (this.isMakeMapper() && !this.isMakeRepo()) {
 				String[] importsArray = importsMyBatis;
-				autowires = AUTOWIRED_MYBATIS;
-				all = GET_ALL;
-				id = GET_BY;				
+				autowires = AUTOWIRED_MYBATIS;			
 				imports = String.join(nl, importsArray);
 				imports = imports.replace(MAPPER_IMPORT, this.getPackage(this.getMapperPath()));
 			}
@@ -244,8 +242,6 @@ public class ServiceParser extends CodeGen {
 			if (!this.isMakeMapper() && this.isMakeRepo()) {
 				String[] importsArray = importsHibernate;
 				autowires = AUTOWIRED_HIBERNATE;
-				all = FIND_ALL;
-				id = FIND_BY;
 				interfaceMethods = hibernateInterfaceMethods();
 				methods = hibernateMethods();
 				imports = String.join(nl, importsArray);
@@ -269,6 +265,8 @@ public class ServiceParser extends CodeGen {
 			generatedServiceImpl = generatedServiceImpl.replace(HIBERNATE_METHODS, methods);
 			generatedServiceImpl = generatedServiceImpl.replace(ALL, all);
 			generatedServiceImpl = generatedServiceImpl.replace(ID, id);
+			generatedServiceImpl = generatedServiceImpl.replace(SAVE_ID, saveId);
+			generatedServiceImpl = generatedServiceImpl.replace(ID_NAME, idName);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE, type);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE_SINGILAR, typeSingular);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE_PLURAL, typePlural);

@@ -35,7 +35,8 @@ public class CodeGen {
 		this.script = script;		
 		this.makeRepo = makeRepo;		
 		this.typePath = typePath;
-		this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		// this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		this.typeName = typeName;
 	}
 	
 	/**
@@ -57,7 +58,8 @@ public class CodeGen {
 		this.script = script;		
 		this.mapperPath = mapperPath;		
 		this.typePath = typePath;
-		this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		// this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		this.typeName = typeName;
 	}
 	
 	/**
@@ -69,7 +71,8 @@ public class CodeGen {
 	public CodeGen(String repoPath, String typePath, String typeName) {
 		this.repoPath = repoPath;		
 		this.typePath = typePath;
-		this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		// this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		this.typeName = typeName;
 	}
 	
 	/**
@@ -99,7 +102,8 @@ public class CodeGen {
 		this.repoPath = repoPath;
 		this.mapperPath = mapperPath;
 		this.typePath = typePath;
-		this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		// this.typeName = inflector.capitalize(inflector.singularize(typeName));
+		this.typeName = typeName;
 	}
 	
 	public CodeGen() {}
