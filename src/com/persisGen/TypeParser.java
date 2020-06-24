@@ -175,7 +175,7 @@ public class TypeParser extends CodeGen {
 				}
 			} else {
 				property = "\tprivate String " + fieldName + ";";
-				ServiceParser.idType = "Sring";
+				ServiceParser.idType = "String";
 			}
 		} else {  // non id columns
 			
@@ -254,7 +254,7 @@ public class TypeParser extends CodeGen {
 						ServiceParser.idType = "long";
 					} else {
 						property = "\t@Id\n\tprivate String " + fieldName + ";";
-						ServiceParser.idType = "Sring";
+						ServiceParser.idType = "String";
 					}
 				} else {  // non id columns
 					

@@ -7,6 +7,7 @@ public class ServiceParser extends CodeGen {
 	
 	public static String idType = "";
 	public static String idName = "";
+	public static String idNameLC = "";
 	
 	// Place holders and Fillers	
 	private String generatedService = "";
@@ -26,6 +27,8 @@ public class ServiceParser extends CodeGen {
 	private final String PROPERTY = "{property}";
 	private final String UPDATE_PROPS = "{updateProperties}";
 	private final String ID_NAME = "{idName}";
+	private final String ID_NAME_LC = "{idNameLC}";
+	private final String ID_TYPE = "{idType}";
 	
 	// TODO Add mybatis code for mappers only
 	// private final String MYBATIS_METHODS = "{myBatisMethods}";
@@ -36,7 +39,7 @@ public class ServiceParser extends CodeGen {
 	private final String ID = "{id}";
 	private final String SAVE_ID = "{saveId}";
 	private final String GET_ALL = "mapper.getAll();";
-	private final String GET_BY = "mapper.getBy{idName}(id);";
+	private final String GET_BY = "mapper.getBy{idName}({idNameLC});";
 	private final String GET_BY_SAVE = "mapper.getBy{idName}(entity.get{idName}());";
 	// private final String FIND_ALL = "repository.findAll();";
 	// private final String FIND_BY = "repository.findBy{idName}(id);";
@@ -103,7 +106,7 @@ public class ServiceParser extends CodeGen {
 		sb.append(nl);
 		sb.append("\tList<{type}> getAll();" + nl);
 		sb.append(nl);
-		sb.append("\t{type} getById(long id);" + nl);
+		sb.append("\t{type} getBy{idName}({idType} {idNameLC});" + nl);
 		sb.append("{hibernateInterfaceMethods}");
 		sb.append("}");
 		return sb.toString();
@@ -129,7 +132,7 @@ public class ServiceParser extends CodeGen {
 		sb.append("\t\t\treturn null;" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
-		sb.append("\tpublic {type} getBy" + idName + "(" + idType + " " + idName + ") {" + nl);
+		sb.append("\tpublic {type} getBy{idName}({idType} {idNameLC}) {" + nl);
 		sb.append("\t\tOptional<{type}> {typeSingular} = {id}" + nl);
 		sb.append(nl);
 		sb.append("\t\tif({typeSingular}.isPresent())" + nl);
@@ -218,6 +221,9 @@ public class ServiceParser extends CodeGen {
 			String id = GET_BY;
 			String saveId = GET_BY_SAVE;
 			
+			// lowercase the id
+			idNameLC = idName.toLowerCase();
+			
 			// set imports, autowires and repo/mapper method calls
 			// both mapper and repo
 			if (this.isMakeRepo() && this.isMakeMapper()) {
@@ -255,6 +261,9 @@ public class ServiceParser extends CodeGen {
 			generatedService = generatedService.replace(HIBERNATE_INTERFACE_METHODS, interfaceMethods);
 			generatedService = generatedService.replace(TYPE, type);
 			generatedService = generatedService.replace(TYPE_SINGILAR, typeSingular);
+			generatedService = generatedService.replace(ID_NAME, idName);
+			generatedService = generatedService.replace(ID_NAME_LC, idNameLC);
+			generatedService = generatedService.replace(ID_TYPE, idType);
 			
 			
 			// start filling in the service impl
@@ -267,6 +276,8 @@ public class ServiceParser extends CodeGen {
 			generatedServiceImpl = generatedServiceImpl.replace(ID, id);
 			generatedServiceImpl = generatedServiceImpl.replace(SAVE_ID, saveId);
 			generatedServiceImpl = generatedServiceImpl.replace(ID_NAME, idName);
+			generatedServiceImpl = generatedServiceImpl.replace(ID_NAME_LC, idNameLC);
+			generatedServiceImpl = generatedServiceImpl.replace(ID_TYPE, idType);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE, type);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE_SINGILAR, typeSingular);
 			generatedServiceImpl = generatedServiceImpl.replace(TYPE_PLURAL, typePlural);
