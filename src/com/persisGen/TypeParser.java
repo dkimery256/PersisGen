@@ -35,6 +35,7 @@ public class TypeParser extends CodeGen {
 		"import lombok.Data;",
 		""
 	};
+	
 	private final String[] hibernateClass = {
 		"@Data",
 		"@Entity",
@@ -48,10 +49,18 @@ public class TypeParser extends CodeGen {
 	// MyBatis Type
 	private final String[] batisClass = {
 		"@Data",
-		"public class {type} {",
+		"public class {type} implements Serializable {",
 		"",
 		"{properties}",
 		"}"
+	};
+	
+	private final String[] batisImports = {
+		"import java.io.Serializable;",
+		"import java.util.Date;",
+		"",
+		"import lombok.Data;",
+		"",
 	};
 	
 	
@@ -70,7 +79,7 @@ public class TypeParser extends CodeGen {
 		StringBuilder sb = new StringBuilder();
 		sb.append("package {package};" + nl);
 		sb.append(nl);
-		sb.append("import lombok.Data;" + nl);
+		sb.append(String.join(nl, batisImports));
 		sb.append(nl);
 		sb.append(String.join(nl, batisClass));
 		return sb.toString();
