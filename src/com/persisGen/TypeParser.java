@@ -10,7 +10,6 @@ public class TypeParser extends CodeGen {
 	
 	private String generated = "";
 	
-	// TODO add enums!!!!!!!!!!!!!!!!!!!
 	/**
 	 * Enum place holder.
 	 * Key - Enum name
