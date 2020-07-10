@@ -126,10 +126,9 @@ public class ServiceParser extends CodeGen {
 		sb.append("\tpublic List<{type}> getAll() {" + nl);
 		sb.append("\t\tList<{type}> {typePlural} = {all}" + nl);
 		sb.append(nl);
-		sb.append("\t\tif({typePlural}.size() > 0)" + nl);
-		sb.append("\t\t\treturn {typePlural};" + nl);
-		sb.append("\t\telse" + nl);
-		sb.append("\t\t\treturn null;" + nl);
+		sb.append("\t\tif({typePlural} == null)" + nl);
+		sb.append("\t\t\t{typePlural} = new ArrayList<{type}>();" + nl);
+		sb.append("\t\treturn {typePlural};" + nl);
 		sb.append("\t}" + nl);
 		sb.append(nl);
 		sb.append("\tpublic {type} getBy{idName}({idType} {idNameLC}) {" + nl);

@@ -1,5 +1,3 @@
-// TODO remove unneeded overrides, fix Service Imp indent, fix postgres Serial data type, add get all to services
-
 package com.persisGen;
 
 import java.io.File;
@@ -45,7 +43,7 @@ public class PersisGen {
 	private Text textRepoPreview;
 	private Text textServicePreview;
 	private Text textServiceImplPreview;
-	private Inflector inflector = new Inflector();
+	//private Inflector inflector = new Inflector();
 
 	/**
 	 * Launch the application.
