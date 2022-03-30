@@ -148,6 +148,7 @@ public class TypeParser extends CodeGen {
 			generated = generated.replace(PROPERTIES, props);
 			
 			// see if it needs any enums
+			// TODO add capability for multiple enums! fuck me...
 			if (enums.size() > 0) {
 				StringBuilder addEnums = new StringBuilder();
 				String enumClass = publicEnum();
